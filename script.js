@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     solveBtn.addEventListener('click', showSolution);
     
     // 键盘输入
-    document.addEventListener('keydown', handleKeyPress);
+    // 移除document级别的键盘事件监听，防止重复输入
+    // document.addEventListener('keydown', handleKeyPress);
     
     // 初始化游戏
     function initGame() {
@@ -205,6 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     cell.classList.add('fixed');
                 } else {
                     cell.addEventListener('click', () => selectCell(cell));
+                    cell.addEventListener('keydown', handleKeyPress); // 添加键盘事件
+                    cell.setAttribute('contenteditable', 'true'); // 使单元格可编辑
                 }
                 
                 board.appendChild(cell);
@@ -347,4 +350,27 @@ document.addEventListener('DOMContentLoaded', () => {
         
         timerDisplay.textContent = `时间: ${minutes}:${seconds}`;
     }
+    
+    // 添加数字面板点击事件
+    const numberButtons = document.querySelectorAll('.number-btn');
+    numberButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (selectedCell && !selectedCell.classList.contains('fixed')) {
+                const number = button.getAttribute('data-number');
+                selectedCell.textContent = number;
+                
+                // 更新游戏板
+                const row = parseInt(selectedCell.dataset.row);
+                const col = parseInt(selectedCell.dataset.col);
+                gameBoard[row][col] = parseInt(number);
+                
+                // 检查是否正确
+                if (gameBoard[row][col] !== solution[row][col]) {
+                    selectedCell.classList.add('error');
+                } else {
+                    selectedCell.classList.remove('error');
+                }
+            }
+        });
+    });
 });
